@@ -1,0 +1,67 @@
+name: 'SLURM srun'
+description: 'Run commands directly using srun'
+inputs:
+  partition:
+    description: 'SLURM partition'
+    required: false
+    default: 'defq'
+  gres:
+    description: 'GRES requirements'
+    required: false
+    default: ''
+  time:
+    description: 'Time limit'
+    required: false
+    default: '00:10:00'
+  commands:
+    description: 'Commands to run'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Execute with srun
+      shell: bash
+      run: |
+        # Create script in runner's home directory
+        SCRIPT_PATH="$HOME/github-action-$(date +%s).sh"
+
+        # Generate the script with proper shebang and commands
+        cat << 'EOF' > "$SCRIPT_PATH"
+        #!/bin/bash
+        set -e
+        cd "$GITHUB_WORKSPACE"
+        {
+        ${{ inputs.commands }}
+        } 2>&1  # Combine stdout and stderr
+        EOF
+
+        chmod +x "$SCRIPT_PATH"
+
+        # Build srun command components
+        SRUN_ARGS=(
+          --partition="${{ inputs.partition }}"
+          --time="${{ inputs.time }}"
+          --job-name="github-actions-$GITHUB_RUN_ID"
+          --ntasks=1
+          --nodes=1
+        )
+
+        # Add GRES if specified
+        if [[ -n "${{ inputs.gres }}" ]]; then
+          SRUN_ARGS+=(--gres="${{ inputs.gres }}")
+        fi
+
+        set +e
+        srun "${SRUN_ARGS[@]}" "$SCRIPT_PATH"
+        EXIT_CODE=$?
+        set -e
+
+        # Cleanup
+        rm -f "$SCRIPT_PATH"
+
+        if [ $EXIT_CODE -ne 0 ]; then
+          echo "❌ SLURM job failed with exit code: $EXIT_CODE"
+          exit $EXIT_CODE
+        else
+          echo "✅ SLURM job completed successfully"
+        fi

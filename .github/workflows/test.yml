@@ -1,0 +1,51 @@
+name: Run SLURM jobs
+on:
+  push:
+jobs:
+  test-default:
+    name: Run with default settings
+    runs-on: [slurm]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          commands: |
+            echo "Hostname: $(hostname)"
+            nvidia-smi || true
+  test-a4000:
+    name: Run on NVIDIA A4000
+    runs-on: [slurm]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          partition: defq
+          gres: gpu:A4000
+          time: 00:01:00
+          commands: |
+            echo "Hostname: $(hostname)"
+            nvidia-smi
+  test-gpus:
+    name: Run on various GPUs
+    runs-on: [slurm]
+    strategy:
+      matrix:
+        gpu:
+          - {type: A4000, partition: defq, rocm: false}
+          - {type: AD4000, partition: fatq, rocm: false}
+          - {type: W7700, partition: defq, rocm: true}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          partition: ${{ matrix.gpu.partition }}
+          gres: gpu:${{ matrix.gpu.type }}
+          time: 00:01:00
+          commands: |-
+            if ${{ matrix.gpu.rocm }}; then
+              echo "=== ROCM-SMI ==="
+              /opt/rocm/bin/amd-smi
+            else
+              echo "=== NVIDIA-SMI ==="
+              nvidia-smi
+            fi

@@ -1,0 +1,34 @@
+name: pre-commit
+on:
+  push:
+jobs:
+  linting:
+    name: run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out a copy of the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set the target and source refs if the trigger was a pull request
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          echo "precommit_from_ref=$GITHUB_BASE_REF" >> $GITHUB_ENV
+          echo "precommit_to_ref=$GITHUB_HEAD_REF" >> $GITHUB_ENV
+      - name: Set the target and source refs if the trigger was not a pull request
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          echo "precommit_from_ref=main" >> $GITHUB_ENV
+          echo "precommit_to_ref=$GITHUB_REF_NAME" >> $GITHUB_ENV
+      - name: Avoid problems with missing refs later
+        run: |
+          git checkout ${{ env.precommit_from_ref }}
+          git checkout ${{ env.precommit_to_ref }}
+      - name: Install pre-commit and related tools
+        run: |
+          pip install pre-commit
+      - name: Run pre-commit on all files changed in this branch using project standard configuration
+        shell: bash -el {0}
+        run: |-
+          git diff --name-only ${{ env.precommit_from_ref }}...${{ env.precommit_to_ref }}
+          pre-commit run --from-ref ${{ env.precommit_from_ref }} --to-ref ${{ env.precommit_to_ref }}
