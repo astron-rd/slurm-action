@@ -28,7 +28,7 @@ runs:
         # Generate the script with proper shebang and commands
         cat << 'EOF' > "$SCRIPT_PATH"
         #!/bin/bash
-        set -e
+        set -x
         cd "$GITHUB_WORKSPACE"
         {
         ${{ inputs.commands }}
