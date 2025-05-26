@@ -16,7 +16,7 @@ jobs:
     runs-on: [self-hosted, slurm]
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/slurm-action
+      - uses: astron-rd/slurm-action@v1
         with:
           partition: defq
           gres: gpu:A4000  # Omit for CPU jobs
