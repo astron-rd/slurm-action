@@ -4,7 +4,7 @@ inputs:
   partition:
     description: 'SLURM partition'
     required: false
-    default: 'defq'
+    default: ''
   gres:
     description: 'GRES requirements'
     required: false
@@ -12,7 +12,7 @@ inputs:
   time:
     description: 'Time limit'
     required: false
-    default: '00:10:00'
+    default: ''
   commands:
     description: 'Commands to run'
     required: true
@@ -39,16 +39,24 @@ runs:
 
         # Build srun command components
         SRUN_ARGS=(
-          --partition="${{ inputs.partition }}"
-          --time="${{ inputs.time }}"
           --job-name="github-actions-$GITHUB_RUN_ID"
           --ntasks=1
           --nodes=1
         )
 
-        # Add GRES if specified
+        # Add partition if specified
+        if [[ -n "${{ inputs.partition }}" ]]; then
+          SRUN_ARGS+=(--partition="${{ inputs.partition }}")
+        fi
+
+        # Add GRES requirements if specified
         if [[ -n "${{ inputs.gres }}" ]]; then
           SRUN_ARGS+=(--gres="${{ inputs.gres }}")
+        fi
+
+        # Add time limit if specified
+        if [[ -n "${{ inputs.time }}" ]]; then
+          SRUN_ARGS+=(--time="${{ inputs.time }}")
         fi
 
         srun "${SRUN_ARGS[@]}" "$SCRIPT_PATH"
