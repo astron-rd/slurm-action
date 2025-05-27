@@ -13,7 +13,7 @@ on: [push]
 
 jobs:
   run-on-slurm:
-    runs-on: [self-hosted, slurm]
+    runs-on: [slurm]
     steps:
       - uses: actions/checkout@v3
       - uses: astron-rd/slurm-action@v1
