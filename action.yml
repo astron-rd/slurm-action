@@ -23,9 +23,8 @@ runs:
       shell: bash
       run: |
         # Create temporary directory
-        TEMP_DIR=$(mktemp -d --tmpdir=$GITHUB_WORKSPACE)
-        ln -s $GITHUB_WORKSPACE/* $TEMP_DIR
-
+        TEMP_DIR=$(mktemp -d --tmpdir=$RUNNER_TEMP)
+        ln -s $RUNNER_TEMP/* $TEMP_DIR
 
         # Generate run script
         SCRIPT_PATH="$TEMP_DIR/run.sh"
