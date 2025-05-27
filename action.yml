@@ -22,14 +22,17 @@ runs:
     - name: Execute with srun
       shell: bash
       run: |
-        # Create script in runner's home directory
-        SCRIPT_PATH="$HOME/github-action-${GITHUB_JOB}-${GITHUB_RUN_ID}.sh"
+        # Create temporary directory
+        TEMP_DIR=$(mktemp -d --tmpdir=$GITHUB_WORKSPACE)
+        ln -s $GITHUB_WORKSPACE/* $TEMP_DIR
 
-        # Generate the script with proper shebang and commands
+
+        # Generate run script
+        SCRIPT_PATH="$TEMP_DIR/run.sh"
         cat << 'EOF' > "$SCRIPT_PATH"
         #!/bin/bash
         set -x
-        cd "$GITHUB_WORKSPACE"
+        cd "$TEMP_DIR"
         {
         ${{ inputs.commands }}
         } 2>&1  # Combine stdout and stderr
@@ -39,6 +42,7 @@ runs:
 
         # Build srun command components
         SRUN_ARGS=(
+          --chdir="$TEMP_DIR"
           --job-name="github-actions-$GITHUB_RUN_ID"
           --ntasks=1
           --nodes=1
@@ -63,7 +67,7 @@ runs:
         EXIT_CODE=$?
 
         # Cleanup
-        rm -f "$SCRIPT_PATH"
+        rm -rf "$TEMP_DIR"
 
         if [ $EXIT_CODE -ne 0 ]; then
           echo "❌ SLURM job failed with exit code: $EXIT_CODE"
