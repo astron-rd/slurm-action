@@ -24,7 +24,11 @@ runs:
       run: |
         # Create temporary directory
         TEMP_DIR=$(mktemp -d --tmpdir=$RUNNER_TEMP)
-        ln -s $RUNNER_TEMP/* $TEMP_DIR
+
+        # Link files from the checkout action (if any)
+        if [ -d $GITHUB_WORKSPACE ]; then
+            ln -s $GITHUB_WORKSPACE/* $TEMP_DIR
+        fi
 
         # Generate run script
         SCRIPT_PATH="$TEMP_DIR/run.sh"
