@@ -54,9 +54,9 @@ jobs:
 1. Register runner with `slurm` label:
 
 ```bash
-./config.sh --labels slurm,self-hosted
+./config.sh --labels slurm
 ```
 
-2. Place this action in .github/actions/slurm/action.yml
+2. Place this action in `.github/actions/slurm/action.yml`
 1. Add `uses: .github/actions/slurm/action.yml` to your workflow
 1. Or use this action directly by specifying: `uses: astron-rd/slurm-action@v1`
