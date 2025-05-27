@@ -2,11 +2,19 @@ name: Run SLURM jobs
 on:
   push:
 jobs:
+  test-checkout:
+    name: Test checkout
+    runs-on: [slurm]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          commands: |
+            cat README.md
   test-default:
     name: Run with default settings
     runs-on: [slurm]
     steps:
-      - uses: actions/checkout@v4
       - uses: ./
         with:
           commands: |
@@ -16,7 +24,6 @@ jobs:
     name: Run on NVIDIA A4000
     runs-on: [slurm]
     steps:
-      - uses: actions/checkout@v4
       - uses: ./
         with:
           partition: defq
@@ -35,7 +42,6 @@ jobs:
           - {type: AD4000, partition: fatq, rocm: false}
           - {type: W7700, partition: defq, rocm: true}
     steps:
-      - uses: actions/checkout@v4
       - uses: ./
         with:
           partition: ${{ matrix.gpu.partition }}
