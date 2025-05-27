@@ -23,7 +23,7 @@ runs:
       shell: bash
       run: |
         # Create script in runner's home directory
-        SCRIPT_PATH="$HOME/github-action-$(date +%s).sh"
+        SCRIPT_PATH="$HOME/github-action-${GITHUB_JOB}-${GITHUB_RUN_ID}.sh"
 
         # Generate the script with proper shebang and commands
         cat << 'EOF' > "$SCRIPT_PATH"
@@ -51,10 +51,8 @@ runs:
           SRUN_ARGS+=(--gres="${{ inputs.gres }}")
         fi
 
-        set +e
         srun "${SRUN_ARGS[@]}" "$SCRIPT_PATH"
         EXIT_CODE=$?
-        set -e
 
         # Cleanup
         rm -f "$SCRIPT_PATH"
