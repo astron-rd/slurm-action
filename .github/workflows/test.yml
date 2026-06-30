@@ -2,33 +2,12 @@ name: Run SLURM jobs
 on:
   push:
 jobs:
-  test-checkout:
-    name: Test checkout
-    runs-on: [slurm]
-    env:
-      ACTION_PATH: ./action-${{ github.run_id }}
-    steps:
-      - name: Checkout action
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.ACTION_PATH }}
-      - name: Run SLURM job
-        uses: ${{ env.ACTION_PATH }}
-        with:
-          commands: |
-            cat README.md
   test-default:
     name: Run with default settings
     runs-on: [slurm]
-    env:
-      ACTION_PATH: ./action-${{ github.run_id }}
     steps:
-      - name: Checkout action
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.ACTION_PATH }}
-      - name: Run SLURM job
-        uses: ${{ env.ACTION_PATH }}
+      - uses: actions/checkout@v4
+      - uses: ./
         with:
           commands: |
             echo "Hostname: $(hostname)"
@@ -36,15 +15,9 @@ jobs:
   test-a4000:
     name: Run on NVIDIA A4000
     runs-on: [slurm]
-    env:
-      ACTION_PATH: ./action-${{ github.run_id }}
     steps:
-      - name: Checkout action
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.ACTION_PATH }}
-      - name: Run SLURM job
-        uses: ${{ env.ACTION_PATH }}
+      - uses: actions/checkout@v4
+      - uses: ./
         with:
           partition: defq
           gres: gpu:A4000
@@ -58,26 +31,15 @@ jobs:
     strategy:
       matrix:
         gpu:
-          - {type: A4000, partition: defq, rocm: false}
-          - {type: AD4000, partition: defq, rocm: false}
-    env:
-      ACTION_PATH: ./action-${{ github.run_id }}-${{ strategy.job-index }}
+          - {type: A4000, partition: defq}
+          - {type: AD4000, partition: defq}
     steps:
-      - name: Checkout action
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.ACTION_PATH }}
-      - name: Run SLURM job
-        uses: ${{ env.ACTION_PATH }}
+      - uses: actions/checkout@v4
+      - uses: ./
         with:
           partition: ${{ matrix.gpu.partition }}
           gres: gpu:${{ matrix.gpu.type }}
           time: 00:01:00
-          commands: |-
-            if ${{ matrix.gpu.rocm }}; then
-              echo "=== ROCM-SMI ==="
-              /opt/rocm/bin/amd-smi
-            else
-              echo "=== NVIDIA-SMI ==="
-              nvidia-smi
-            fi
+          commands: |
+            echo "Hostname: $(hostname)"
+            nvidia-smi
