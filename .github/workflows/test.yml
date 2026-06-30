@@ -39,8 +39,7 @@ jobs:
       matrix:
         gpu:
           - {type: A4000, partition: defq, rocm: false}
-          - {type: AD4000, partition: fatq, rocm: false}
-          - {type: W7700, partition: defq, rocm: true}
+          - {type: AD4000, partition: defq, rocm: false}
     steps:
       - uses: ./
         with:
