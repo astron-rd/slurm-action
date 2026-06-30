@@ -1,30 +1,36 @@
 name: Run SLURM jobs
 on:
   push:
+
+env:
+  ACTION_REF: ${{ github.repository }}@${{ github.sha }}
+
 jobs:
   test-checkout:
     name: Test checkout
     runs-on: [slurm]
     steps:
       - uses: actions/checkout@v4
-      - uses: ./
+      - uses: ${{ env.ACTION_REF }}
         with:
           commands: |
             cat README.md
+
   test-default:
     name: Run with default settings
     runs-on: [slurm]
     steps:
-      - uses: ./
+      - uses: ${{ env.ACTION_REF }}
         with:
           commands: |
             echo "Hostname: $(hostname)"
             nvidia-smi || true
+
   test-a4000:
     name: Run on NVIDIA A4000
     runs-on: [slurm]
     steps:
-      - uses: ./
+      - uses: ${{ env.ACTION_REF }}
         with:
           partition: defq
           gres: gpu:A4000
@@ -32,6 +38,7 @@ jobs:
           commands: |
             echo "Hostname: $(hostname)"
             nvidia-smi
+
   test-gpus:
     name: Run on various GPUs
     runs-on: [slurm]
@@ -41,7 +48,7 @@ jobs:
           - {type: A4000, partition: defq, rocm: false}
           - {type: AD4000, partition: defq, rocm: false}
     steps:
-      - uses: ./
+      - uses: ${{ env.ACTION_REF }}
         with:
           partition: ${{ matrix.gpu.partition }}
           gres: gpu:${{ matrix.gpu.type }}
