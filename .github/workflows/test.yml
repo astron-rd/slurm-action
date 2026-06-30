@@ -5,26 +5,30 @@ jobs:
   test-checkout:
     name: Test checkout
     runs-on: [slurm]
+    env:
+      ACTION_PATH: ./action-${{ github.run_id }}
     steps:
       - name: Checkout action
         uses: actions/checkout@v4
         with:
-          path: action-${{ github.run_id }}
+          path: ${{ env.ACTION_PATH }}
       - name: Run SLURM job
-        uses: ./action-${{ github.run_id }}
+        uses: ${{ env.ACTION_PATH }}
         with:
           commands: |
             cat README.md
   test-default:
     name: Run with default settings
     runs-on: [slurm]
+    env:
+      ACTION_PATH: ./action-${{ github.run_id }}
     steps:
       - name: Checkout action
         uses: actions/checkout@v4
         with:
-          path: action-${{ github.run_id }}
+          path: ${{ env.ACTION_PATH }}
       - name: Run SLURM job
-        uses: ./action-${{ github.run_id }}
+        uses: ${{ env.ACTION_PATH }}
         with:
           commands: |
             echo "Hostname: $(hostname)"
@@ -32,13 +36,15 @@ jobs:
   test-a4000:
     name: Run on NVIDIA A4000
     runs-on: [slurm]
+    env:
+      ACTION_PATH: ./action-${{ github.run_id }}
     steps:
       - name: Checkout action
         uses: actions/checkout@v4
         with:
-          path: action-${{ github.run_id }}
+          path: ${{ env.ACTION_PATH }}
       - name: Run SLURM job
-        uses: ./action-${{ github.run_id }}
+        uses: ${{ env.ACTION_PATH }}
         with:
           partition: defq
           gres: gpu:A4000
@@ -54,13 +60,15 @@ jobs:
         gpu:
           - {type: A4000, partition: defq, rocm: false}
           - {type: AD4000, partition: defq, rocm: false}
+    env:
+      ACTION_PATH: ./action-${{ github.run_id }}-${{ strategy.job-index }}
     steps:
       - name: Checkout action
         uses: actions/checkout@v4
         with:
-          path: action-${{ github.run_id }}-${{ strategy.job-index }}
+          path: ${{ env.ACTION_PATH }}
       - name: Run SLURM job
-        uses: ./action-${{ github.run_id }}-${{ strategy.job-index }}
+        uses: ${{ env.ACTION_PATH }}
         with:
           partition: ${{ matrix.gpu.partition }}
           gres: gpu:${{ matrix.gpu.type }}
