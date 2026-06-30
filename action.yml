@@ -9,6 +9,10 @@ inputs:
     description: 'GRES requirements'
     required: false
     default: ''
+  constraints:
+    description: 'Node constraints'
+    required: false
+    default: ''
   time:
     description: 'Time limit'
     required: false
@@ -49,6 +53,11 @@ runs:
         # Add GRES requirements if specified
         if [[ -n "${{ inputs.gres }}" ]]; then
           SRUN_ARGS+=(--gres="${{ inputs.gres }}")
+        fi
+
+        # Add constraints if specified
+        if [[ -n "${{ inputs.constraints }}" ]]; then
+          SRUN_ARGS+=(--constraint="${{ inputs.constraints }}")
         fi
 
         # Add time limit if specified
