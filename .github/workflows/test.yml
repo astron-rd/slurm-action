@@ -1,10 +1,8 @@
 name: Run SLURM jobs
 on:
   push:
-
 env:
   ACTION_REF: ${{ github.repository }}@${{ github.sha }}
-
 jobs:
   test-checkout:
     name: Test checkout
@@ -15,7 +13,6 @@ jobs:
         with:
           commands: |
             cat README.md
-
   test-default:
     name: Run with default settings
     runs-on: [slurm]
@@ -25,7 +22,6 @@ jobs:
           commands: |
             echo "Hostname: $(hostname)"
             nvidia-smi || true
-
   test-a4000:
     name: Run on NVIDIA A4000
     runs-on: [slurm]
@@ -38,7 +34,6 @@ jobs:
           commands: |
             echo "Hostname: $(hostname)"
             nvidia-smi
-
   test-gpus:
     name: Run on various GPUs
     runs-on: [slurm]
