@@ -26,7 +26,7 @@ runs:
         SCRIPT_PATH="$(mktemp -p ${RUNNER_TEMP})"
         cat << 'EOF' > "$SCRIPT_PATH"
         #!/bin/bash
-        set -x
+        set -euo pipefail
         {
         ${{ inputs.commands }}
         } 2>&1  # Combine stdout and stderr
