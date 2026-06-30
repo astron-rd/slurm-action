@@ -32,7 +32,7 @@ jobs:
       matrix:
         gpu:
           - {type: A4000, partition: defq}
-          - {type: AD4000, partition: defq}
+          - {type: AD4000, partition: rbq}
     steps:
       - uses: actions/checkout@v4
       - uses: ./
