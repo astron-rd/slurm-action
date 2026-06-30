@@ -9,9 +9,9 @@ jobs:
       - name: Checkout action
         uses: actions/checkout@v4
         with:
-          path: ${{ runner.temp }}
+          path: action-${{ github.run_id }}
       - name: Run SLURM job
-        uses: ${{ runner.temp }}
+        uses: ./action-${{ github.run_id }}
         with:
           commands: |
             cat README.md
@@ -22,9 +22,9 @@ jobs:
       - name: Checkout action
         uses: actions/checkout@v4
         with:
-          path: ${{ runner.temp }}
+          path: action-${{ github.run_id }}
       - name: Run SLURM job
-        uses: ${{ runner.temp }}
+        uses: ./action-${{ github.run_id }}
         with:
           commands: |
             echo "Hostname: $(hostname)"
@@ -36,9 +36,9 @@ jobs:
       - name: Checkout action
         uses: actions/checkout@v4
         with:
-          path: ${{ runner.temp }}
+          path: action-${{ github.run_id }}
       - name: Run SLURM job
-        uses: ${{ runner.temp }}
+        uses: ./action-${{ github.run_id }}
         with:
           partition: defq
           gres: gpu:A4000
@@ -58,9 +58,9 @@ jobs:
       - name: Checkout action
         uses: actions/checkout@v4
         with:
-          path: ${{ runner.temp }}/${{ strategy.job-index }}
+          path: action-${{ github.run_id }}-${{ strategy.job-index }}
       - name: Run SLURM job
-        uses: ${{ runner.temp }}/${{ strategy.job-index }}
+        uses: ./action-${{ github.run_id }}-${{ strategy.job-index }}
         with:
           partition: ${{ matrix.gpu.partition }}
           gres: gpu:${{ matrix.gpu.type }}
