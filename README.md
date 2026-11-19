@@ -20,6 +20,8 @@ jobs:
         with:
           partition: defq
           gres: gpu:A4000  # Omit for CPU jobs
+          exclusive: true # Allocate a whole, dedicated node
+          cpus_per_task: 36  # CPUs per task, e.g. one socket's thread count
           time: 00:10:00   # Max runtime (HH:MM:SS)
           commands: |
             echo "Running on $(hostname)"
@@ -29,18 +31,24 @@ jobs:
 
 ## Input Parameters
 
-| Parameter | Required | Default  | Description                     |
-| --------- | -------- | -------- | ------------------------------- |
-| partition | No       | defq     | SLURM partition name            |
-| gres      | No       | (none)   | GPU resources (e.g., gpu:A4000) |
-| time      | No       | 00:10:00 | Maximum job runtime             |
-| commands  | Yes      | -        | Commands to execute on SLURM    |
+| Parameter     | Required | Default  | Description                                         |
+| ------------- | -------- | -------- | --------------------------------------------------- |
+| partition     | No       | defq     | SLURM partition name                                |
+| gres          | No       | (none)   | GPU resources (e.g., gpu:A4000)                     |
+| constraints   | No       | (none)   | Node constraints (--constraint)                     |
+| exclusive     | No       | false    | Allocate an exclusive, dedicated node (--exclusive) |
+| cpus_per_task | No       | (none)   | CPUs per task (--cpus-per-task)                     |
+| time          | No       | 00:10:00 | Maximum job runtime                                 |
+| commands      | Yes      | -        | Commands to execute on SLURM                        |
 
 ## Features
 
 - Real-time output
 - Automatic cleanup of temporary files
 - Supports GPU resource requests via GRES
+- Node constraints via `constraints`
+- Exclusive node allocation via `exclusive`
+- CPU per-task count via `cpus_per_task`
 - Proper error code propagation
 
 # Requirements

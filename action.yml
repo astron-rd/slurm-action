@@ -13,6 +13,14 @@ inputs:
     description: 'Node constraints'
     required: false
     default: ''
+  exclusive:
+    description: 'Allocate an exclusive node (appends --exclusive to srun)'
+    required: false
+    default: 'false'
+  cpus_per_task:
+    description: 'CPUs per task (appends --cpus-per-task to srun)'
+    required: false
+    default: ''
   time:
     description: 'Time limit'
     required: false
@@ -58,6 +66,16 @@ runs:
         # Add constraints if specified
         if [[ -n "${{ inputs.constraints }}" ]]; then
           SRUN_ARGS+=(--constraint="${{ inputs.constraints }}")
+        fi
+
+        # Exclusive node allocation
+        if [[ "${{ inputs.exclusive }}" == 'true' ]]; then
+          SRUN_ARGS+=(--exclusive)
+        fi
+
+        # CPUs per task
+        if [[ -n "${{ inputs.cpus_per_task }}" ]]; then
+          SRUN_ARGS+=(--cpus-per-task="${{ inputs.cpus_per_task }}")
         fi
 
         # Add time limit if specified
